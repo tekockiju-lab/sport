@@ -44,7 +44,9 @@ button,input,select,textarea{font:inherit;color:inherit}
 .top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding:6px 0 14px}
 .kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
 h1{font-size:34px;line-height:1;letter-spacing:.04em}
-.status{font-size:12px;color:var(--muted);text-align:right;min-height:16px}
+.status{font-size:12px;color:var(--muted);text-align:right;height:16px;line-height:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 0 40%;width:40%}
+.top>div:first-child{flex:1 1 auto;min-width:0;height:48px}.top .kicker{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+input,textarea,select{font-size:16px}
 .vis{grid-column:1/-1;display:flex;gap:6px;margin:10px 0 6px}.vis figure{margin:0;flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:4px 4px 3px;display:flex;flex-direction:column}.vis figure.m{flex:1.35}.vis .vf{flex:1;display:flex;align-items:center}.vis svg{width:100%;height:auto;display:block}.vis figcaption{font-size:10.5px;line-height:1.2;text-align:center;color:var(--muted);padding-top:2px}.vis .sk,.vis .sa{fill:none;stroke:var(--fg);stroke-width:4.2;stroke-linecap:round;stroke-linejoin:round}.vis .sa{stroke:var(--accent)}.vis .hd{fill:var(--surface);stroke:var(--fg);stroke-width:3}.vis .fl{stroke:var(--line);stroke-width:1.5}.vis .bn{fill:var(--line);stroke:var(--line);stroke-width:3;stroke-linecap:round}.vis .rl{stroke:var(--line);stroke-width:2}.vis .eq{fill:var(--muted);stroke:var(--fg)}.vis .eq2{stroke:var(--muted);stroke-width:3;stroke-linecap:round}.vis .cb{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:3 2}.vis .ar{stroke:#d83a30;stroke-width:2.2}.vis .arh{fill:#d83a30}.vis .bm{fill:var(--line)}.vis .mp{fill:#d83a30}.vis .ms{fill:#f2a59f}.vis .mt{font-size:9px;text-anchor:middle;fill:var(--muted)}
 .weeks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:6px}.day.wk{padding:8px 4px}.day.wk b{font-size:15px;font-family:var(--f-body,inherit);font-weight:700}.wtheme{margin:0 0 10px;font-size:13px;color:var(--muted);text-align:center}
 .days{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
@@ -147,7 +149,7 @@ td{padding:8px 4px;border-top:1px solid var(--line)}
 #nav{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);z-index:5;
   padding:6px max(10px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))}
 #nav .in{max-width:640px;margin:0 auto}
-#timer{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--accent);color:var(--accent-fg);border-radius:8px;padding:8px 12px;margin-bottom:6px;font-weight:600}
+#timer{margin:0 0 8px;display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--accent);color:var(--accent-fg);border-radius:8px;padding:8px 12px;margin-bottom:6px;font-weight:600}
 #timer .t{font-family:var(--f-display);font-size:24px;font-variant-numeric:tabular-nums}
 #timer button{background:transparent;border:1px solid currentColor;color:inherit;border-radius:6px;padding:6px 10px;cursor:pointer}
 .tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
@@ -175,7 +177,6 @@ td{padding:8px 4px;border-top:1px solid var(--line)}
   <main id="view"><div class="banner"><span class="lab">Страница не запустилась</span>Предпросмотр файлов в Telegram не выполняет скрипты. Открой ссылку из чата с Claude в приложении Claude или в обычном браузере (Safari, Chrome).</div></main>
 </div>
 <nav id="nav"><div class="in">
-  <div id="timer" hidden><span>Отдых</span><span class="t" id="tval">0:00</span><button type="button" id="tskip">Пропустить</button></div>
   <div class="tabs">
     <button type="button" data-tab="train">Тренировка</button>
     <button type="button" data-tab="hist">Журнал</button>
@@ -912,7 +913,7 @@ async function writeDoc(col,id,data){
   try{
     if(S.db){await S.db.doc(col+'/'+id).set(data);}
     else{const m=col==='sessions'?S.sessions:S.body;m[id]=data;localSave(col);}
-    setStatus(S.db?'Сохранено в журнал':'Сохранено на этом телефоне');
+    setStatus(S.db?'Сохранено в журнал':'Сохранено ✓');
     if(!S.db){if(S.tab==='hist')renderHist();if(S.tab==='body')renderBody();}
   }catch(e){setStatus('Не сохранено: '+(e&&(e.message||e.code)||'ошибка'));}
 }
@@ -931,7 +932,7 @@ async function initStore(){
   let db=null;
   try{db=(MODE!=='pwa'&&window.claude&&window.claude.use)?await window.claude.use('db'):null;}catch(e){db=null;}
   if(!db){
-    localLoad();setStatus(MODE==='pwa'?'Работает без интернета · записи на этом телефоне':'Журнал не подключён: записи хранятся только на этом телефоне');
+    localLoad();setStatus(MODE==='pwa'?'Офлайн · данные на телефоне':'Журнал не подключён: записи хранятся только на этом телефоне');
     S.loaded=true;if(!S.touched){if(!S.dayPicked)S.day=suggestNext();loadDraft();}render();return;
   }
   S.db=db;setStatus('Журнал подключён');
@@ -949,17 +950,24 @@ async function initStore(){
 
 /* ───────── Таймер отдыха ───────── */
 let tEnd=0,tInt=null;
-function startTimer(sec){
+let tNode=null;
+function timerEl(){
+  if(!tNode){tNode=document.createElement('div');tNode.id='timer';
+    tNode.innerHTML='<span class="tl">Отдых</span><span class="t">0:00</span><button type="button">Пропустить</button>';
+    tNode.querySelector('button').addEventListener('click',()=>{clearInterval(tInt);tNode.remove();});}
+  return tNode;
+}
+function startTimer(sec,row){
   if(!sec)return;
-  tEnd=Date.now()+sec*1000;$('#timer').hidden=false;$('#timer').firstElementChild.textContent='Отдых';
+  const n=timerEl();if(row)row.after(n);
+  tEnd=Date.now()+sec*1000;n.querySelector('.tl').textContent='Отдых';
   clearInterval(tInt);tInt=setInterval(tick,250);tick();
 }
 function tick(){
   const left=Math.max(0,Math.ceil((tEnd-Date.now())/1000));
-  $('#tval').textContent=Math.floor(left/60)+':'+String(left%60).padStart(2,'0');
-  if(left===0){clearInterval(tInt);$('#timer').firstElementChild.textContent='Отдых закончен';try{navigator.vibrate&&navigator.vibrate(250);}catch(e){}}
+  const n=timerEl();n.querySelector('.t').textContent=Math.floor(left/60)+':'+String(left%60).padStart(2,'0');
+  if(left===0){clearInterval(tInt);n.querySelector('.tl').textContent='Отдых закончен';try{navigator.vibrate&&navigator.vibrate(250);}catch(e){}}
 }
-$('#tskip').addEventListener('click',()=>{clearInterval(tInt);$('#timer').hidden=true;});
 
 /* ───────── Вкладка «Тренировка» ───────── */
 function timeLine(day){const e=estimate(day);return 'Расчёт: разминка 9 мин, основная часть около '+e.core+' мин'+(e.opt?', ещё около '+e.opt+' мин, если останется':'');}
@@ -1197,7 +1205,7 @@ view.addEventListener('click',e=>{
   else if(a==='done'){
     const e2=ALLEX[b.dataset.ex],s=S.draft.sets[b.dataset.ex][+b.dataset.i];
     s.d=s.d?0:1;b.classList.toggle('on',!!s.d);scheduleSave();
-    if(s.d)startTimer(e2.restSec);
+    if(s.d){try{document.activeElement&&document.activeElement.blur();}catch(x){}startTimer(e2.restSec,b.closest('.sr'));}
   }
   else if(a==='copyprev'){
     const e2=ALLEX[b.dataset.ex],prev=prevSessions(e2)[0];if(!prev)return;
