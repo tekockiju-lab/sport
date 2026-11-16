@@ -167,7 +167,7 @@ td{padding:8px 4px;border-top:1px solid var(--line)}
 .lbx{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:99;display:flex;align-items:center;justify-content:center;padding:10px}.lbx img{max-width:100%;max-height:100%;border-radius:10px}
 .vis.mo{justify-content:center}.vis.mo figure.m{flex:0 1 220px}
 </style>
-<style>html{background:var(--bg);color-scheme:light dark}html,body{overscroll-behavior-y:none}body{padding-top:calc(10px + env(safe-area-inset-top,0px))}#nav{padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))}</style></head><body>
+<style>html{background:var(--bg);color-scheme:light dark}html,body{overscroll-behavior-y:none}body{padding-top:calc(10px + env(safe-area-inset-top,0px))}#nav{padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))}</style><style>.weekpick{display:block;font-size:12px;color:var(--muted);margin-bottom:10px}.weekpick select{display:block;width:100%;margin-top:5px;height:46px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);padding:0 10px;font-size:16px}.release{font-size:11px;color:var(--accent);margin:0 0 10px;font-weight:600}.day b{font-size:19px}#nav .in{max-height:calc(100dvh - 30px);overflow-y:auto}</style></head><body>
 
 <div class="wrap">
   <header class="top">
@@ -559,6 +559,61 @@ for(let w=1;w<=3;w++)for(let i=0;i<3;i++){const k=dayKey(w,i);DAYNAME[k]=SLOTNAM
 ORDER.length=0;for(let w=1;w<=3;w++)for(let i=0;i<3;i++)ORDER.push(dayKey(w,i));
 Object.values(PLAN).forEach(p=>p.ex.forEach(e=>{if(!ALLEX[e.id])ALLEX[e.id]=e;}));
 
+
+/* План до 31 декабря 2026: прежние записи и идентификаторы упражнений сохранены. */
+const APP_RELEASE='План до 31.12.2026 · обновление 16.11';
+const SCHEDULE={wed3:'2026-11-17',fri3:'2026-11-18'};
+const WEEKLABEL={1:'Неделя 1 · прежний цикл',2:'Неделя 2 · прежний цикл',3:'Неделя 3 · завершение 17–18 ноября',4:'23–29 ноября · A / B / C',5:'30 ноября — 6 декабря · A / B / C',6:'7–13 декабря · A / B / C',7:'14–20 декабря · A / B / C',8:'21–27 декабря · A / B / C',9:'28–31 декабря · облегчённая'};
+const DECEMBER_DATES=[['2026-11-23','2026-11-25','2026-11-27'],['2026-11-30','2026-12-02','2026-12-04'],['2026-12-07','2026-12-09','2026-12-11'],['2026-12-14','2026-12-16','2026-12-18'],['2026-12-21','2026-12-23','2026-12-25'],['2026-12-28','2026-12-30']];
+const HYPERTROPHY=[
+ [
+  ['mBench',3,8,10,120,'70 кг, гриф вместе с блинами'],
+  ['fRow',3,10,12,120,'36 кг на том же блочном тренажёре'],
+  ['wLegPress',3,10,12,120,'95–100 кг блинов суммарно'],
+  ['wCurl',3,10,15,90,'около 32 кг на том же тренажёре'],
+  ['fLat',2,12,20,75,'4–6 кг, вес одной гантели'],
+  ['mCrunch',2,12,15,75,'подобрать вес с запасом 2–3 повтора']
+ ],[
+  ['wSquat',3,8,10,150,'75 кг, гриф вместе с блинами'],
+  ['mIncl',3,8,12,120,'14 кг, вес одной гантели'],
+  ['vLever',3,10,12,120,'около 50–54 кг на том же тренажёре'],
+  ['dbShP',2,8,12,120,'10 кг, вес одной гантели'],
+  ['calfG',2,12,15,75,'30 кг блинов'],
+  ['fCurl',2,10,15,75,'20 кг, EZ-гриф вместе с блинами']
+ ],[
+  ['wRdl',3,8,12,150,'18 кг, вес одной гантели'],
+  ['cInclM',3,8,12,120,'на один доступный шаг ниже прежних 68 кг'],
+  ['hLever',3,10,12,120,'50 кг на том же тренажёре'],
+  ['legExt',2,12,15,90,'подобрать вес с запасом 2–3 повтора'],
+  ['fRear',2,12,20,75,'27 кг на том же тренажёре'],
+  ['cDips',2,10,15,75,'около 36 кг на том же тренажёре']
+ ]
+];
+DECEMBER_DATES.forEach((dates,row)=>{
+ const w=row+4,light=w===9;
+ WEEKTHEME[w]=light?'Завершение блока: по 2 подхода, вес ниже на 10–15%, запас 3–4 повтора':w===4?'Рост мышц: знакомые упражнения, запас около 3 повторов':'Рост мышц: добавляй повторения, затем минимальный шаг веса; запас около 2 повторов';
+ dates.forEach((date,i)=>{
+  const key=dayKey(w,i),letter=['A','B','C'][i];SCHEDULE[key]=date;
+  DAYNAME[key]='Всё тело '+letter;DAYFULL[key]='Всё тело '+letter+': рост мышц';
+  PLAN[key]={
+   warm:['3–5 минут лёгкой дорожки или велосипеда','Перед первым тяжёлым упражнением 2–3 разминочных подхода с постепенным повышением веса','Перед первым жимом или тягой 1–2 лёгких разминочных подхода; они не входят в рабочие'],
+   ex:HYPERTROPHY[i].map(([id,sets,lo,hi,sec,start],n)=>A(id,String(n+1),null,light?2:sets,lo,hi,sec===150?'2–3 мин':sec===120?'2 мин':sec+' с',sec,{role:n<3?'Основное':'Дополнительное',startWeightHint:light?'Снизь последний рабочий вес на 10–15%':start,noProg:light?1:0,minRir:light?3:w===4?3:2})),
+   cardio:{name:'Спокойная ходьба',img:'treadmill',min:'по желанию, если осталось время',txt:'Сначала выполни силовую часть. Дополнительное кардио в этот час не обязательно.'},
+   cool:'1–2 минуты спокойного движения и запись результатов.',
+   phaseNote:light?'Облегчённые занятия: 2 рабочих подхода на упражнение, вес на 10–15% ниже последнего, запас 3–4 повтора.':w===4?'Первая неделя блока: проверь стартовые веса, оставляй около 3 повторов в запасе.':'Работай с запасом около 2 повторов. Два выполнения подряд достиг верхней границы во всех подходах — прибавь минимальный доступный шаг веса.'
+  };
+  PLAN[key].ex.forEach(e=>{if(!ALLEX[e.id])ALLEX[e.id]=e;});ORDER.push(key);
+ });
+});
+function hasSets(s){return !!(s&&s.sets&&Object.values(s.sets).some(a=>logged(a).length));}
+function completed(s){return !!(s&&(s.completed===true||(s.completed==null&&s.date<iso(new Date())&&hasSets(s))));}
+function selectInitial(){
+ const open=Object.values(S.sessions).filter(s=>s&&PLAN[s.day]&&s.completed===false&&hasSets(s)).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+ if(open.length){S.day=open[0].day;S.date=open[0].date;return;}
+ S.day=suggestNext();S.date=SCHEDULE[S.day]||iso(new Date());
+}
+function weekDay(w,i){const key=dayKey(w,i);return PLAN[key]?key:dayKey(w,0);}
+
 /* ───────── Иллюстрации: схема движения (старт / финиш) и карта мышц ───────── */
 const VZ={};
 VZ.ik=function(p0,p2,a,b,side){
@@ -787,9 +842,9 @@ function estimate(day){
 /* ───────── Логика подсказок и прогрессии ───────── */
 //#logic-start
 const num=v=>{const n=parseFloat(String(v).replace(',','.'));return isNaN(n)?null:n;};
-const logged=a=>(a||[]).filter(x=>x&&num(x.w)!==null&&num(x.r)!==null);
-const fmtSets=(a,unit)=>logged(a).map(x=>x.w+'×'+x.r).join(', ')+(unit==='с'&&logged(a).length?' с':'');
-function qualifies(a,e){const L=logged(a);if(L.length<e.sets)return false;return L.every(x=>num(x.r)>=e.hi&&(x.q===''||x.q==null||num(x.q)>=1));}
+const logged=a=>(Array.isArray(a)?a:[]).filter(x=>x&&num(x.r)!==null&&num(x.r)>0&&(x.w===''||x.w==null||(num(x.w)!==null&&num(x.w)>=0)));
+const fmtSets=(a,unit)=>logged(a).map(x=>(x.w===''||x.w==null?'':x.w+'×')+x.r).join(', ')+(unit==='с'&&logged(a).length?' с':'');
+function qualifies(a,e){const L=logged(a);if(L.length<e.sets)return false;return L.every(x=>num(x.r)>=e.hi&&(e.minRir?(num(x.q)!==null&&num(x.q)>=e.minRir):(x.q===''||x.q==null||num(x.q)>=1)));}
 const volume=a=>logged(a).reduce((t,x)=>t+num(x.w)*num(x.r),0);
 function hintFor(e,hist){
   if(!hist.length) return {tone:'plain',text:'Первая запись: подбери вес так, чтобы после последнего повтора оставалось 2 в запасе.'};
@@ -821,9 +876,9 @@ function lastDone(day){
   return L.length?L[L.length-1]:'';
 }
 function suggestNext(){
-  const all=Object.values(S.sessions).filter(s=>s&&s.date&&s.day&&s.sets&&Object.values(s.sets).some(a=>logged(a).length)).sort((a,b)=>a.date<b.date?1:-1);
+  const all=Object.values(S.sessions).filter(s=>s&&s.date&&PLAN[s.day]&&completed(s)).sort((a,b)=>a.date<b.date?1:-1);
   if(!all.length)return 'mon';
-  return ORDER[(ORDER.indexOf(all[0].day)+1)%ORDER.length];
+  return ORDER[Math.min(ORDER.indexOf(all[0].day)+1,ORDER.length-1)];
 }
 function initDay(){S.date=iso(new Date());S.day='mon';}
 const CHECK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -834,8 +889,8 @@ function loadDraft(){
   const d=src?JSON.parse(JSON.stringify(src)):{};
   d.id=id;d.date=S.date;d.day=S.day;
   ['feel','sleep','shoulder','note'].forEach(k=>{if(d[k]==null)d[k]='';});
-  d.cardio=!!d.cardio;d.sets=d.sets||{};
-  PLAN[S.day].ex.forEach(e=>{const a=d.sets[e.id]||[];d.sets[e.id]=Array.from({length:e.sets},(_,i)=>Object.assign(blankSet(),a[i]||{}));});
+  d.cardio=!!d.cardio;d.completed=src?completed(src):false;d.sets=d.sets||{};
+  PLAN[S.day].ex.forEach(e=>{const a=d.sets[e.id]||[];d.sets[e.id]=Array.from({length:Math.max(e.sets,a.length)},(_,i)=>Object.assign(blankSet(),a[i]||{}));});
   S.draft=d;S.touched=false;
 }
 function prevSessions(e){
@@ -901,13 +956,13 @@ function setStatus(t){const el=$('#status');if(el)el.textContent=t;}
 function scheduleSave(){
   S.touched=true;setStatus('Сохраняю…');
   pending={id:S.draft.id,data:JSON.parse(JSON.stringify(S.draft))};
-  clearTimeout(saveTimer);saveTimer=setTimeout(flush,700);
+  clearTimeout(saveTimer);if(!S.db){flush();}else saveTimer=setTimeout(flush,700);
 }
 function flush(){
   clearTimeout(saveTimer);
   if(!pending)return;
   const p=pending;pending=null;
-  chain=chain.then(()=>writeDoc('sessions',p.id,Object.assign(p.data,{updatedAt:Date.now()})));
+  const data=Object.assign(p.data,{updatedAt:Date.now()});if(!S.db){writeDoc('sessions',p.id,data);}else chain=chain.then(()=>writeDoc('sessions',p.id,data));
 }
 async function writeDoc(col,id,data){
   try{
@@ -920,11 +975,11 @@ async function writeDoc(col,id,data){
 async function deleteDoc(col,id){
   try{
     if(S.db){await S.db.doc(col+'/'+id).delete();}
-    else{delete (col==='sessions'?S.sessions:S.body)[id];localSave(col);}
+    else{delete (col==='sessions'?S.sessions:S.body)[id];localSave(col);if(col==='sessions'&&S.draft&&S.draft.id===id)loadDraft();}
     if(!S.db){if(col==='sessions')renderHist();else renderBody();}
   }catch(e){setStatus('Не удалено: '+(e&&(e.message||e.code)||'ошибка'));}
 }
-function localSave(col){try{localStorage.setItem('ddx.'+col,JSON.stringify(col==='sessions'?S.sessions:S.body));}catch(e){}}
+function localSave(col){localStorage.setItem('ddx.'+col,JSON.stringify(col==='sessions'?S.sessions:S.body));}
 function localLoad(){
   try{S.sessions=JSON.parse(localStorage.getItem('ddx.sessions')||'{}')||{};S.body=JSON.parse(localStorage.getItem('ddx.body')||'{}')||{};}catch(e){S.sessions={};S.body={};}
 }
@@ -933,13 +988,13 @@ async function initStore(){
   try{db=(MODE!=='pwa'&&window.claude&&window.claude.use)?await window.claude.use('db'):null;}catch(e){db=null;}
   if(!db){
     localLoad();setStatus(MODE==='pwa'?'Офлайн · данные на телефоне':'Журнал не подключён: записи хранятся только на этом телефоне');
-    S.loaded=true;if(!S.touched){if(!S.dayPicked)S.day=suggestNext();loadDraft();}render();return;
+    S.loaded=true;if(!S.touched){if(!S.dayPicked)selectInitial();loadDraft();}render();return;
   }
   S.db=db;setStatus('Журнал подключён');
   const onErr=e=>setStatus('Журнал недоступен: '+(e&&(e.message||e.code)||'ошибка'));
   db.collection('sessions').onSnapshot(snap=>{
     const m={};snap.docs.forEach(d=>{m[d.id]=d.data();});S.sessions=m;
-    if(!S.loaded){S.loaded=true;if(!S.touched){if(!S.dayPicked)S.day=suggestNext();loadDraft();}render();}
+    if(!S.loaded){S.loaded=true;if(!S.touched){if(!S.dayPicked)selectInitial();loadDraft();}render();}
     else{refreshHints();if(S.tab==='hist')renderHist();}
   },onErr);
   db.collection('body').onSnapshot(snap=>{
@@ -954,12 +1009,12 @@ let tNode=null;
 function timerEl(){
   if(!tNode){tNode=document.createElement('div');tNode.id='timer';
     tNode.innerHTML='<span class="tl">Отдых</span><span class="t">0:00</span><button type="button">Пропустить</button>';
-    tNode.querySelector('button').addEventListener('click',()=>{clearInterval(tInt);tNode.remove();});}
+    tNode.querySelector('button').addEventListener('click',()=>{clearInterval(tInt);tEnd=0;tNode.remove();});}
   return tNode;
 }
 function startTimer(sec,row){
   if(!sec)return;
-  const n=timerEl();if(row)row.after(n);
+  const n=timerEl();if(!n.isConnected)document.querySelector('#nav .in').prepend(n);
   tEnd=Date.now()+sec*1000;n.querySelector('.tl').textContent='Отдых';
   clearInterval(tInt);tInt=setInterval(tick,250);tick();
 }
@@ -1000,6 +1055,7 @@ function exHTML(e){
     +'<div class="exh">'+thumb+'<div><div class="role">'+(e.ss?'<span class="ssTag">суперсет</span>':'')+esc(e.role)+'</div><h3>'+esc(e.name)+'</h3>'
     +'<div class="scheme"><b>'+e.sets+' × '+e.lo+'–'+e.hi+(unit==='с'?' с':'')+'</b> · отдых '+esc(e.rest)+'</div>'+(e.wt?'<div class="wtl">Вес: '+esc(WT[e.wt])+'</div>':'')+'</div></div></div>'
     +visHTML2(e)
+    +(e.startWeightHint&&(weekOf(S.day)===4||weekOf(S.day)===9||!prev)?'<div class="hint">'+esc(weekOf(S.day)===9?'Облегчённая неделя: ':'Старт блока: ')+esc(e.startWeightHint)+'.</div>':'')
     +hintHTML(e)
     +'<div class="sets"><div class="sh"><span></span><span>'+esc(WTSHORT[e.wt]||'Вес, кг')+'</span><span>'+(unit==='с'?'Секунды':'Повт.')+'</span><span>Запас</span><span></span></div>'+rows+'</div>'
     +'<div class="exact">'+(prev?'<button type="button" class="link" data-act="copyprev" data-ex="'+e.id+'">Подставить прошлый раз</button>':'')+'</div>'
@@ -1014,11 +1070,11 @@ function renderTrain(){
   const P=PLAN[S.day],d=S.draft;
   const nxt=suggestNext();
   const wk=weekOf(S.day);
-  const weeks=[1,2,3].map(w=>{const nw=weekOf(nxt);return '<button type="button" class="day wk '+(w===wk?'on':'')+'" data-act="week" data-w="'+w+'" aria-pressed="'+(w===wk)+'"><b>Неделя '+w+'</b>'+(w===nw?'<span class="nx">следующая</span>':'<span>&nbsp;</span>')+'</button>';}).join('');
-  const days=[0,1,2].map(i=>dayKey(wk,i)).map(k=>{const ld=lastDone(k);return '<button type="button" class="day '+(k===S.day?'on':'')+'" data-act="day" data-d="'+k+'" aria-pressed="'+(k===S.day)+'"><b>'+esc(DAYNAME[k])+'</b><span>'+(ld?'было '+fmt(ld):'ещё не было')+'</span>'+(k===nxt?'<span class="nx">следующая</span>':'')+'</button>';}).join('');
+  const weeks='<label class="weekpick">Неделя программы<select id="planWeek">'+Object.keys(WEEKLABEL).map(w=>'<option value="'+w+'" '+(+w===wk?'selected':'')+'>'+esc(WEEKLABEL[w])+'</option>').join('')+'</select></label>';
+  const days=[0,1,2].map(i=>dayKey(wk,i)).filter(k=>PLAN[k]).map(k=>{const ld=lastDone(k);return '<button type="button" class="day '+(k===S.day?'on':'')+'" data-act="day" data-d="'+k+'" aria-pressed="'+(k===S.day)+'"><b>'+esc(DAYNAME[k])+'</b>'+(SCHEDULE[k]?'<span>'+esc(fmt(SCHEDULE[k]))+'</span>':'')+'<span>'+(ld?'было '+fmt(ld):'ещё не было')+'</span>'+(k===nxt?'<span class="nx">следующая</span>':'')+'</button>';}).join('');
   const shBtn=(v,l,c)=>'<button type="button" class="'+c+' '+(d.shoulder===v?'on':'')+'" data-act="shoulder" data-v="'+v+'">'+l+'</button>';
-  let h='<div class="weeks">'+weeks+'</div><p class="wtheme">'+esc(WEEKTHEME[wk]||'')+'</p><div class="days">'+days+'</div>'
-   +'<div class="title"><h2>'+esc(DAYFULL[S.day])+'</h2><p>'+esc(timeLine(S.day))+'</p></div>'+timeBanner(S.day)
+  let h='<p class="release">'+APP_RELEASE+'</p>'+weeks+'<p class="wtheme">'+esc(WEEKTHEME[wk]||'')+'</p><div class="days">'+days+'</div>'
+   +'<div class="title"><h2>'+esc(DAYFULL[S.day])+'</h2><p>'+esc(timeLine(S.day))+'</p></div>'+timeBanner(S.day)+(P.phaseNote?'<div class="banner">'+esc(P.phaseNote)+'</div>':'')
    +'<div class="panel"><div class="fields">'
    +'<label>Дата<input type="date" id="fDate" value="'+esc(S.date)+'"></label>'
    +'<label>Самочувствие, 1–10<input type="number" inputmode="numeric" min="1" max="10" id="fFeel" data-sf="feel" value="'+esc(d.feel)+'"></label>'
@@ -1031,7 +1087,8 @@ function renderTrain(){
    +'<label class="tog"><input type="checkbox" id="fCardio" '+(d.cardio?'checked':'')+'>Сделано</label></div></div>'
    +'<div class="sec">Заминка</div><p style="margin:0;font-size:14px">'+esc(P.cool)+'</p>'
    +'<div class="sec">Заметки к тренировке</div><textarea class="note" id="fNote" data-sf="note" placeholder="Ощущения, техника, что подкорректировать">'+esc(d.note)+'</textarea>'
-   +'<p class="rec">Записывай вес, повторения и запас по каждому подходу. Отметка справа запускает таймер отдыха.</p>';
+   +'<p class="rec">Записывай вес, повторения и запас по каждому подходу. Отметка справа запускает таймер отдыха.</p>'
+   +'<div class="row"><button type="button" class="btn" data-act="finishsession">'+(d.completed?'Тренировка завершена ✓':'Завершить тренировку')+'</button>'+(d.completed&&ORDER.indexOf(S.day)<ORDER.length-1?'<button type="button" class="btn ghost" data-act="nextsession">Следующая по плану</button>':'')+'</div><p class="rec" id="finishMsg">'+(d.completed?'Запись сохранена.':'Нажми «Завершить тренировку», когда закончишь. Незавершённая запись откроется при следующем запуске.')+'</p>';
   $('#view').innerHTML=h;
 }
 
@@ -1137,6 +1194,7 @@ function renderBody(){
 /* ───────── Вкладка «Правила» ───────── */
 function renderRules(){
   $('#view').innerHTML='<div class="title"><h2>Правила</h2><p>Как писать вес, прогрессировать и когда останавливаться</p></div><div class="rules">'
+  +'<p class="banner">'+APP_RELEASE+'. Новая программа — три занятия всего тела в неделю по 60 минут, с 23 ноября. Последние занятия 28 и 30 декабря облегчённые. Выбирай неделю в списке на вкладке «Тренировка».</p>'
   +'<h3>Как писать вес</h3><ul>'
   +'<li><b>Гантели:</b> вес одной гантели. Если в каждой руке по 14 кг, пиши 14.</li>'
   +'<li><b>Смит:</b> гриф (15 кг) плюс блины, всё вместе. 15 + 60 пиши как 75.</li>'
@@ -1148,10 +1206,8 @@ function renderRules(){
   +'<li>Основные подходы не режь: сократи отдых между подходами до 90 с.</li>'
   +'<li>Суперсет значит: сделал подход первого упражнения, сразу подход второго, и только потом отдых.</li>'
   +'<li>Ориентир: в зал вошёл, через 60 минут выходишь. Если три тренировки подряд не успеваешь основную часть, пиши тренеру: уберём ещё подходы.</li></ul>'
-  +'<h3>Если день сорвался</h3><ul><li>Приложение предлагает следующую тренировку по кругу: 3 недели по три дня (Верх A, Низ, Верх B), потом снова с недели 1. Пропуск ничего не сбивает, просто идёшь дальше. Любую тренировку можно выбрать вручную: сверху недели, под ними дни.</li>'
-  +'<li>Три тренировки в неделю достаточно. Можно сдвигать на вторник, четверг или выходной.</li>'
-  +'<li>Между тренировками по возможности один день отдыха. Верх A и Верх B подряд не ставь.</li></ul>'
-  +'<h3>Как устроен цикл на 3 недели</h3><ul><li>Расписание остаётся тем же: Верх A, Низ, Верх B. Каждую неделю часть упражнений меняется, чтобы нагружать мышцы под разными углами.</li><li>Основные упражнения (смит, жимы, присед, жим ногами) возвращаются через неделю или две. Вес и повторения подтягиваются из прошлых записей даже если упражнение было на другой неделе.</li><li>Если неделя вышла тяжёлой (сон, работа, усталость), на следующей тренировке сделай 2 подхода вместо 3 в вспомогательных упражнениях и продолжай цикл.</li></ul><h3>Прогрессия нагрузки</h3><ol>'
+  +'<h3>Расписание до конца декабря</h3><ul><li>17 ноября — оставшийся Низ, 18 ноября — Верх B прежнего цикла.</li><li>С 23 ноября повторяются три тренировки всего тела A, B и C: понедельник, среда, пятница. По возможности оставляй между ними день отдыха.</li><li>Если перенёс занятие, выбери нужную тренировку и исправь поле «Дата» на фактический день. Продолжай последовательность A → B → C.</li><li>В конце занятия нажми «Завершить тренировку». До этого запись считается незавершённой и откроется при следующем запуске.</li><li>28 и 30 декабря — по два рабочих подхода, вес ниже на 10–15%, запас 3–4 повтора. 31 декабря — отдых.</li></ul>'
+  +'<h3>Прогрессия нагрузки</h3><ol>'
   +'<li>У каждого упражнения есть диапазон повторений, например 8–10.</li>'
   +'<li>Пока верх диапазона не достигнут во всех подходах с запасом 1–2 повтора, вес не меняется. Растут повторения.</li>'
   +'<li>Две тренировки подряд верх диапазона во всех подходах: прибавь вес (смит +2,5 кг, гантели +2 кг, стек на один шаг).</li>'
@@ -1162,12 +1218,8 @@ function renderRules(){
   +'<li>Тупое жжение в работающей мышце: норма.</li>'
   +'<li>Разминка плеча (ротация и тяга к лицу) обязательна перед жимами.</li>'
   +'<li>Если боль повторяется или нарастает, покажись ортопеду или травматологу и сделай УЗИ плеча.</li></ul>'
-  +'<h3>Сушка</h3><ul><li>Кардио в зале добавляет немного: 10 минут ходьбы в горку это порядка 70–100 ккал. Решают питание и шаги.</li>'
-  +'<li>Белок в каждом приёме пищи: мясо, рыба, яйца, творог. Ориентир 140–170 г в сутки.</li>'
-  +'<li>После тренировки блюдо с явным источником белка, каша и блины гарниром. Алкоголь один вечер в выходные.</li>'
-  +'<li>В дни без зала прогулка 30–40 минут.</li>'
-  +'<li>Вес и талию записывай на вкладке «Замеры». Если за 2–3 недели вес не идёт вниз, убираем около 200–300 ккал в день.</li></ul>'
-  +'<h3>Сон и сауна</h3><ul><li>Цель 7–8 часов. Самый дешёвый рычаг: лечь в 22:00–22:30.</li>'
+  +'<h3>Рост мышц</h3><ul><li>Основной ориентир — рост повторений и рабочих весов при сохранении техники.</li><li>Белок: ориентир 1,6–2,2 г на килограмм массы тела в сутки. Для расчёта в граммах нужен текущий вес.</li><li>Питайся регулярно и отслеживай массу тела и талию в одинаковых условиях. Крупный скачок веса каждую неделю не нужен.</li><li>Кардио после силовой — по желанию, если осталось время.</li></ul>'
+  +'<h3>Сон и сауна</h3><ul><li>Цель 7–9 часов. Самый дешёвый рычаг: лечь в 22:00–22:30.</li>'
   +'<li>Сауна и хамам не сжигают жир, но восстановление не мешают. Пей воду после. Хочешь выкроить время: 10 минут вместо 15 дают лишний блок в зале.</li></ul>'
   +'<h3>Тревожные симптомы</h3><p>Боль в груди, обморок, сильная необычная одышка: прекращай тренировку и обращайся за срочной медицинской помощью.</p></div>';
 }
@@ -1180,7 +1232,7 @@ function render(){
 }
 document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{S.tab=b.dataset.tab;flush();render();window.scrollTo(0,0);}));
 
-function switchTo(day,date){flush();S.day=day;S.date=date;S.dayPicked=true;loadDraft();renderTrain();}
+function switchTo(day,date,scheduled=false){if(!PLAN[day])return;flush();S.day=day;S.date=scheduled?(SCHEDULE[day]||date):date;S.dayPicked=true;loadDraft();renderTrain();}
 const view=$('#view');
 view.addEventListener('input',e=>{
   const t=e.target;if(!S.draft)return;
@@ -1191,26 +1243,29 @@ view.addEventListener('change',e=>{
   const t=e.target;
   if(t.id==='fDate'&&t.value){switchTo(S.day,t.value);}
   if(t.id==='fCardio'){S.draft.cardio=t.checked;scheduleSave();}
+  if(t.id==='planWeek'){switchTo(weekDay(+t.value,Math.max(0,slotOf(S.day))),S.date,true);}
 });
 view.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b)return;
   const a=b.dataset.act;
-  if(a==='day'){switchTo(b.dataset.d,S.date);}
-  else if(a==='week'){switchTo(dayKey(+b.dataset.w,Math.max(0,slotOf(S.day))),S.date);}
+  if(a==='day'){switchTo(b.dataset.d,S.date,true);}
+  else if(a==='week'){switchTo(weekDay(+b.dataset.w,Math.max(0,slotOf(S.day))),S.date,true);}
+  else if(a==='finishsession'){if(!hasSets(S.draft)){$('#finishMsg').textContent='Сначала запиши хотя бы один подход.';return;}S.draft.completed=true;scheduleSave();renderTrain();}
+  else if(a==='nextsession'){const i=ORDER.indexOf(S.day);if(i>=0&&i<ORDER.length-1)switchTo(ORDER[i+1],S.date,true);}
   else if(a==='shoulder'){
     S.draft.shoulder=S.draft.shoulder===b.dataset.v?'':b.dataset.v;
     document.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x.dataset.v===S.draft.shoulder));
     $('#shMsg').textContent=shMsgText(S.draft.shoulder);scheduleSave();
   }
   else if(a==='done'){
-    const e2=ALLEX[b.dataset.ex],s=S.draft.sets[b.dataset.ex][+b.dataset.i];
+    const e2=PLAN[S.day].ex.find(x=>x.id===b.dataset.ex),s=S.draft.sets[b.dataset.ex][+b.dataset.i];
     s.d=s.d?0:1;b.classList.toggle('on',!!s.d);scheduleSave();
     if(s.d){try{document.activeElement&&document.activeElement.blur();}catch(x){}startTimer(e2.restSec,b.closest('.sr'));}
   }
   else if(a==='copyprev'){
     const e2=ALLEX[b.dataset.ex],prev=prevSessions(e2)[0];if(!prev)return;
     const ps=prev.sets[e2.id]||[];
-    S.draft.sets[e2.id].forEach((s,i)=>{const p=ps[i];if(p&&p.w){s.w=p.w;s.r=p.r||'';}});
+    S.draft.sets[e2.id].forEach((s,i)=>{const p=ps[i];if(p&&(p.w||p.r)){s.w=p.w||'';s.r=p.r||'';}});
     document.querySelectorAll('[data-ex="'+e2.id+'"][data-f]').forEach(inp=>{const s=S.draft.sets[e2.id][+inp.dataset.i];if(inp.dataset.f==='w'||inp.dataset.f==='r')inp.value=s[inp.dataset.f];});
     scheduleSave();
   }
@@ -1254,11 +1309,12 @@ view.addEventListener('click',e=>{
 /* Экран не гаснет в зале, если браузер разрешает */
 let wake=null;
 async function keepAwake(){try{if(navigator.wakeLock&&document.visibilityState==='visible')wake=await navigator.wakeLock.request('screen');}catch(e){}}
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')keepAwake();});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){keepAwake();if(tEnd)tick();}else flush();});
+window.addEventListener('pagehide',flush);
 keepAwake();
 
 if(MODE==='pwa'){
-  try{if('serviceWorker' in navigator)window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}catch(e){}
+  try{if('serviceWorker' in navigator)window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});});}catch(e){}
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist();}catch(e){}
 }
 initDay();loadDraft();render();initStore();
